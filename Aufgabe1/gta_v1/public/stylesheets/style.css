@@ -11,7 +11,8 @@ label, input {
 }
 
 [class*="col-"] {
-    float: left;
+    display: flex;
+    flex-direction: column;
     padding: 15px;
     border: 1px solid red;
 }
