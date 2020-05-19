@@ -44,6 +44,7 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
         document.getElementById('longitude').value = getLongitude(position);
         document.getElementById('hidden_latitude').value = getLatitude(position);
         document.getElementById('hidden_longitude').value = getLongitude(position);
+        document.getElementById('result-img').src = getLocationMapSrc(getLatitude(position), getLongitude(position));
     };
 
     var showErrorMessage = function (message) {
@@ -92,7 +93,7 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
     };
 
     // Hier Google Maps API Key eintragen
-    var apiKey = "YOUR_API_KEY_HERE";
+    var apiKey = "oDcf0lAJ9bQKmFfh4HO4vr9rXDngJIAB";
 
     /**
      * Funktion erzeugt eine URL, die auf die Karte verweist.
