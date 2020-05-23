@@ -82,7 +82,7 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
     };
 
     // Hier Google Maps API Key eintragen
-    var apiKey = "YOUR_API_KEY_HERE";
+    var apiKey = "L4uT0AEzjTGGz1OlFQkKsiIxjb9jt4c2";
 
     /**
      * Funktion erzeugt eine URL, die auf die Karte verweist.
@@ -121,15 +121,15 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
 
         updateLocation: function () {
             tryLocate(function (onsuccess) {
-                    document.getElementById("latitude").value = onsuccess.coords.latitude;
-                    document.getElementById("longitude").value = onsuccess.coords.longitude;
-                    document.getElementById("hidden_latitude").value = onsuccess.coords.latitude;
-                    document.getElementById("hidden_longitude").value = onsuccess.coords.longitude;
+                    document.getElementById("latitude").value = getLatitude(onsuccess);
+                    document.getElementById("longitude").value = getLongitude(onsuccess);
+                    document.getElementById("hidden_latitude",).value = getLatitude(onsuccess);
+                    document.getElementById("hidden_longitude").value = getLongitude(onsuccess);
+                    document.getElementById("result-img").src = getLocationMapSrc(getLatitude(onsuccess), getLongitude(onsuccess), undefined, 15);
                 }, function (onerror) {
                     alert(onerror);
                 }
             )
-
         }
 
     }; // ... Ende öffentlicher Teil
