@@ -131,7 +131,8 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
         readme: "Dieses Objekt enthält 'öffentliche' Teile des Moduls.",
 
         updateLocation: function () {
-            tryLocate(updateLocationFields, showErrorMessage);
+            if (document.getElementById('latitude').value === '')
+                tryLocate(updateLocationFields, showErrorMessage);
         }
 
     }; // ... Ende öffentlicher Teil

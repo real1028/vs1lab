@@ -73,13 +73,15 @@ const tagsModule = (function () {
             }
         },
         
-        searchTag: function (hashtag) {
+        searchTag: function (searchterm) {
+            let gtag = [];
             for (let i = 0; i < taglist.length; i++) {
-                if (taglist[i].hashtag === hashtag) {
-                    return taglist[i];
+                console.log(taglist[i]);
+                if (taglist[i].hashtag.includes(searchterm)) {
+                    gtag.push(taglist[i]);
                 }
             }
-            return [];
+            return gtag;
         },
         
         searchTagsWithRadius: function (coordinate, radius) {
@@ -110,7 +112,11 @@ const tagsModule = (function () {
 
 app.get('/', function(req, res) {
     res.render('gta', {
-        taglist: []
+        taglist: [],
+        coordinates: {
+            latitude: '',
+            longitude: ''
+        }
     });
 });
 
@@ -132,7 +138,11 @@ app.post('/tagging', function(req, res) {
     tagsModule.addTag(gtag);
     const tagsToRender = tagsModule.searchTagsWithRadius({latitude: gtag.latitude, longitude: gtag.longitude}, 10);
     res.render('gta', {
-        taglist: tagsToRender
+        taglist: tagsToRender,
+        coordinates: {
+            latitude: gtag.latitude,
+            longitude: gtag.longitude
+        }
     });
 });
 
@@ -150,11 +160,15 @@ app.post('/tagging', function(req, res) {
  */
 
 app.post('/discovery', function(req, res) {
-    const gtag = tagsModule.searchTag(req.body.hashtag);
+    const gtag = tagsModule.searchTag(req.body.searchterm);
     res.render('gta', {
         taglist: gtag === undefined
-            ? tagsModule.searchTagsWithRadius({latitude: req.body.latitude, longitude: req.body.longitude}, 10) // no tag found - take the last one
-            : tagsModule.searchTagsWithRadius({latitude: gtag.latitude, longitude: gtag.longitude}, 10) // tag found - take this one
+            ? tagsModule.searchTagsWithRadius({latitude: req.body.hidden_latitude, longitude: req.body.hidden_longitude}, 10) // no tag found - take the last one
+            : tagsModule.searchTagsWithRadius({latitude: gtag.latitude, longitude: gtag.longitude}, 10), // tag found - take this one
+        coordinates: {
+            latitude: gtag === undefined ? req.body.latitude : gtag.latitude,
+            longitude: gtag === undefined ? req.body.longitude : gtag.longitude
+        }
     });
 });
 

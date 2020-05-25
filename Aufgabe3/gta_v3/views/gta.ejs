@@ -30,16 +30,16 @@
 					<fieldset>
 						<legend>Enter new GeoTag</legend>
 						<label for="latitude">latitude</label>
-						<input id="latitude" pattern="[0-9]+[.]?[0-9]+" placeholder="49.01379" required type="text"/>
+						<input id="latitude" pattern="[0-9]+[.]?[0-9]+" name="latitude" placeholder="49.01379" required type="text" value="<%= coordinates.latitude %>"/>
 
 						<label for="longitude">logitude</label>
-						<input id="longitude" pattern="[0-9]+[.]?[0-9]+" placeholder="8.390071" required type="text"/>
+						<input id="longitude" pattern="[0-9]+[.]?[0-9]+" name="longitude" placeholder="8.390071" required type="text" value="<%= coordinates.longitude %>"/>
 
 						<label for="name">name</label>
-						<input id="name" maxlength="10" placeholder="some name" required type="text"/>
+						<input id="name" maxlength="10" name="name" placeholder="some name" required type="text"/>
 
 						<label for="hashtag">hashtag</label>
-						<input id="hashtag" maxlength="11" pattern="#[a-zA-Z]{1,10}" placeholder="# + max. 10 letters" type="text"/>
+						<input id="hashtag" maxlength="11" name="hashtag" pattern="#[a-zA-Z]{1,10}" placeholder="# + max. 10 letters" type="text"/>
 
 						<input type="submit" value="submit"/>
 					</fieldset>
@@ -55,10 +55,10 @@
 				<form action="/discovery" id="filter-form" method="post">
 					<fieldset>
 						<legend>Filter by Searchterm</legend>
-						<input id="searchterm" placeholder="search term" type="text"/>
+						<input id="searchterm" name="searchterm" placeholder="search term" type="text"/>
 						<input type="submit" value="apply"/>
-						<input id="hidden_latitude" type="hidden" value=""/>
-						<input id="hidden_longitude" type="hidden" value=""/>
+						<input id="hidden_latitude" name="hidden_latitude" type="hidden" value="<%= coordinates.latitude %>"/>
+						<input id="hidden_longitude" name="hidden_longitude" type="hidden" value="<%= coordinates.longitude %>"/>
 					</fieldset>
 				</form>
 				<!-- ############### Aufgabe1a Form2 Ende -->
@@ -67,7 +67,7 @@
 					<div class="taglist col-5">
 						<ul id="results">
 							<% if (taglist !== undefined) taglist.forEach(function(gtag) { %>
-								<li><%= gtag.name %> ( <%= gtag.latitude %>,<%= gtag.longitude %>) <%= gtag.hashtag %> </li>
+								<li><%= gtag.name %> (<%= gtag.latitude %>, <%= gtag.longitude %>) <%= gtag.hashtag %> </li>
 							<% }); %>
 						</ul>
 					</div>
