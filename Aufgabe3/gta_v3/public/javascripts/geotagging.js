@@ -133,6 +133,10 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
         updateLocation: function () {
             if (document.getElementById('latitude').value === '')
                 tryLocate(updateLocationFields, showErrorMessage);
+            else {
+                const taglist_json = document.getElementById('result-img').getAttribute('data-tags');
+                document.getElementById('result-img').src = getLocationMapSrc(document.getElementById('hidden_latitude').value, document.getElementById('hidden_longitude').value, JSON.parse(taglist_json));
+            }
         }
 
     }; // ... Ende öffentlicher Teil

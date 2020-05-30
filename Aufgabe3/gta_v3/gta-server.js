@@ -59,10 +59,21 @@ const tagsModule = (function () {
 
     let taglist = [];
 
+    const distance = function (lon1, lat1, lon2, lat2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = (lat2-lat1) * Math.PI / 180;  // Javascript functions in radians
+        var dLon = (lon2-lon1) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var dist = R * c; // Distance in km
+        return dist;
+    };
+
     return {
         addTag: function (gtag) {
             taglist.push(gtag);
-            console.log('tag added', gtag)
         },
 
         removeTag: function (gtag) {
@@ -76,8 +87,7 @@ const tagsModule = (function () {
         searchTag: function (searchterm) {
             let gtag = [];
             for (let i = 0; i < taglist.length; i++) {
-                console.log(taglist[i]);
-                if (taglist[i].hashtag.includes(searchterm)) {
+                if (taglist[i].hashtag.includes(searchterm) || taglist[i].name.includes(searchterm)) {
                     gtag.push(taglist[i]);
                 }
             }
@@ -87,11 +97,7 @@ const tagsModule = (function () {
         searchTagsWithRadius: function (coordinate, radius) {
             let tagsWithRadius = [];
             for (let i = 0; i < taglist.length; i++) {
-                if (    taglist[i].latitude >= coordinate.latitude - radius
-                    &&  taglist[i].latitude <= coordinate.latitude + radius
-                    &&  taglist[i].longitude >= coordinate.longitude - radius
-                    &&  taglist[i].longitude <= coordinate.longitude + radius
-                ) {
+                if (distance(taglist[i].latitude, taglist[i].longitude, coordinate.latitude, coordinate.longitude) <= radius) {
                     tagsWithRadius.push(taglist[i]);
                 }
             }
@@ -134,9 +140,9 @@ app.get('/', function(req, res) {
  */
 
 app.post('/tagging', function(req, res) {
-    const gtag = gtagConstructor(req.body.name, req.body.latitude, req.body.longitude, req.body.hashtag);
+    const gtag = gtagConstructor(req.body.name, parseFloat(req.body.latitude), parseFloat(req.body.longitude), req.body.hashtag);
     tagsModule.addTag(gtag);
-    const tagsToRender = tagsModule.searchTagsWithRadius({latitude: gtag.latitude, longitude: gtag.longitude}, 10);
+    const tagsToRender = tagsModule.searchTagsWithRadius({latitude: parseFloat(gtag.latitude), longitude: parseFloat(gtag.longitude)}, 20);
     res.render('gta', {
         taglist: tagsToRender,
         coordinates: {
@@ -161,15 +167,26 @@ app.post('/tagging', function(req, res) {
 
 app.post('/discovery', function(req, res) {
     const gtag = tagsModule.searchTag(req.body.searchterm);
-    res.render('gta', {
-        taglist: gtag === undefined
-            ? tagsModule.searchTagsWithRadius({latitude: req.body.hidden_latitude, longitude: req.body.hidden_longitude}, 10) // no tag found - take the last one
-            : tagsModule.searchTagsWithRadius({latitude: gtag.latitude, longitude: gtag.longitude}, 10), // tag found - take this one
-        coordinates: {
-            latitude: gtag === undefined ? req.body.latitude : gtag.latitude,
-            longitude: gtag === undefined ? req.body.longitude : gtag.longitude
+    var renderObject = {};
+    if (gtag.length !== 0) {
+        renderObject = {
+            taglist: tagsModule.searchTagsWithRadius({latitude: parseFloat(gtag[0].latitude), longitude: parseFloat(gtag[0].longitude)}, 20),
+            coordinates: {
+                latitude: parseFloat(gtag[0].latitude),
+                longitude: parseFloat(gtag[0].longitude)
+            }
         }
-    });
+    } else {
+        renderObject = {
+            taglist: tagsModule.searchTagsWithRadius({latitude: parseFloat(req.body.hidden_latitude), longitude: parseFloat(req.body.hidden_longitude)}, 20),
+            coordinates: {
+                latitude: parseFloat(req.body.hidden_latitude),
+                longitude: parseFloat(req.body.hidden_longitude)
+            }
+        }
+    }
+
+    res.render('gta', renderObject);
 });
 
 /**
