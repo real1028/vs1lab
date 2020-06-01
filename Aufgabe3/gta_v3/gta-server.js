@@ -30,6 +30,7 @@ app.set('view engine', 'ejs');
  */
 
 // TODO: CODE ERGÄNZEN
+app.use(express.static(__dirname + "/public"));
 
 /**
  * Konstruktor für GeoTag Objekte.
@@ -37,6 +38,26 @@ app.set('view engine', 'ejs');
  */
 
 // TODO: CODE ERGÄNZEN
+function GeoTag(latitude, longitude, name, hashtag){
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.name = name;
+    this.hashtag = hashtag;
+
+    this.getLatitude = function () {
+        return this.latitude;
+    };
+    this.getLongitude = function () {
+        return this.longitude;
+    };
+    this.getName = function () {
+        return this.name;
+    };
+    this.getHashtag = function () {
+        return this.hashtag;
+    };
+}
+
 
 /**
  * Modul für 'In-Memory'-Speicherung von GeoTags mit folgenden Komponenten:
