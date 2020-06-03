@@ -70,6 +70,40 @@ function GeoTag(latitude, longitude, name, hashtag){
 
 // TODO: CODE ERGÄNZEN
 
+var InMemory = (function () {
+    var tagList = [];
+
+    return {
+        searchByRadius: function (latitude, longitude, radius) {
+            var resultList = tagList.filter(function (entry) {
+                return (
+                    (Math.abs(entry.getLatitude() - latitude) < radius) &&
+                    (Math.abs(entry.getLongitude() - longitude) < radius)
+                );
+            });
+            return resultList;
+        },
+
+        searchByTerm: function (term) {
+            var resultList = tagList.filter(function (entry) {
+                return (
+                    entry.getName().toString().includes(term) ||
+                    entry.getHashtag().toString().includes(term)
+                );
+            });
+            return resultList;
+        },
+
+        add: function (GeoTag) {
+            tagList.push(GeoTag);
+        },
+
+        remove: function (GeoTag) {
+            tagList.splice(GeoTag.getCurrentPosition(), 1);
+        }
+    }
+})();
+
 /**
  * Route mit Pfad '/' für HTTP 'GET' Requests.
  * (http://expressjs.com/de/4x/api.html#app.get.method)
@@ -100,6 +134,22 @@ app.get('/', function(req, res) {
 
 // TODO: CODE ERGÄNZEN START
 
+app.post('/tagging', function (req, res) {
+    var lat = req.body.lat;
+    var lon = req.body.lon;
+    var name = req.body.myName;
+    var hashtag = req.body.myHashtag;
+
+    InMemory.add(new GeoTag(lat, lon, name, hashtag));
+
+    res.render('gta', {
+        taglist: InMemory.searchByRadius(lat, lon, 10),
+        lat: lat,
+        lon: lon,
+        tags: hashtag
+    });
+});
+
 /**
  * Route mit Pfad '/discovery' für HTTP 'POST' Requests.
  * (http://expressjs.com/de/4x/api.html#app.post.method)
@@ -113,6 +163,24 @@ app.get('/', function(req, res) {
  */
 
 // TODO: CODE ERGÄNZEN
+
+app.post('/discovery', function (req, res) {
+    var lat = req.body.hLat;
+    var lon = req.body.hLon;
+    var term = req.body.searchTerm;
+
+    if(term){
+        res.render('gta', {
+            taglist: InMemory.searchByTerm(term),
+            lat: lat,
+            lon: lon
+        })} else {
+        res.render('gta', {
+            taglist: InMemory.searchByRadius(lat, lon, 10),
+            lat: lat,
+            lon: lon
+    })}
+});
 
 /**
  * Setze Port und speichere in Express.
