@@ -141,5 +141,7 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
  * des Skripts.
  */
 $(function() {
-    gtaLocator.updateLocation();
+    if(!document.getElementById("latitude").value || !document.getElementById("longitude").value){
+        gtaLocator.updateLocation();
+    }
 });
