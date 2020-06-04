@@ -18,7 +18,7 @@ var app;
 app = express();
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({
-    extended: false
+	extended: false
 }));
 
 // Setze ejs als View Engine
@@ -38,24 +38,24 @@ app.use(express.static(__dirname + "/public"));
  */
 
 // TODO: CODE ERGÄNZEN
-function GeoTag(latitude, longitude, name, hashtag){
-    this.latitude = latitude;
-    this.longitude = longitude;
-    this.name = name;
-    this.hashtag = hashtag;
+function GeoTag(latitude, longitude, name, hashtag) {
+	this.latitude = latitude;
+	this.longitude = longitude;
+	this.name = name;
+	this.hashtag = hashtag;
 
-    this.getLatitude = function () {
-        return this.latitude;
-    };
-    this.getLongitude = function () {
-        return this.longitude;
-    };
-    this.getName = function () {
-        return this.name;
-    };
-    this.getHashtag = function () {
-        return this.hashtag;
-    };
+	this.getLatitude = function () {
+		return this.latitude;
+	};
+	this.getLongitude = function () {
+		return this.longitude;
+	};
+	this.getName = function () {
+		return this.name;
+	};
+	this.getHashtag = function () {
+		return this.hashtag;
+	};
 }
 
 
@@ -71,37 +71,37 @@ function GeoTag(latitude, longitude, name, hashtag){
 // TODO: CODE ERGÄNZEN
 
 var InMemory = (function () {
-    var tagList = [];
+	var tagList = [];
 
-    return {
-        searchByRadius: function (latitude, longitude, radius) {
-            var resultList = tagList.filter(function (entry) {
-                return (
-                    (Math.abs(entry.getLatitude() - latitude) < radius) &&
-                    (Math.abs(entry.getLongitude() - longitude) < radius)
-                );
-            });
-            return resultList;
-        },
+	return {
+		searchByRadius: function (latitude, longitude, radius) {
+			var resultList = tagList.filter(function (entry) {
+				return (
+					(Math.abs(entry.getLatitude() - latitude) < radius) &&
+					(Math.abs(entry.getLongitude() - longitude) < radius)
+				);
+			});
+			return resultList;
+		},
 
-        searchByTerm: function (term) {
-            var resultList = tagList.filter(function (entry) {
-                return (
-                    entry.getName().toString().includes(term) ||
-                    entry.getHashtag().toString().includes(term)
-                );
-            });
-            return resultList;
-        },
+		searchByTerm: function (term) {
+			var resultList = tagList.filter(function (entry) {
+				return (
+					entry.getName().toString().includes(term) ||
+					entry.getHashtag().toString().includes(term)
+				);
+			});
+			return resultList;
+		},
 
-        add: function (GeoTag) {
-            tagList.push(GeoTag);
-        },
+		add: function (GeoTag) {
+			tagList.push(GeoTag);
+		},
 
-        remove: function (GeoTag) {
-            tagList.splice(GeoTag.getCurrentPosition(), 1);
-        }
-    }
+		remove: function (GeoTag) {
+			tagList.splice(GeoTag.getCurrentPosition(), 1);
+		}
+	}
 })();
 
 /**
@@ -113,10 +113,12 @@ var InMemory = (function () {
  * Als Response wird das ejs-Template ohne Geo Tag Objekte gerendert.
  */
 
-app.get('/', function(req, res) {
-    res.render('gta', {
-        taglist: []
-    });
+app.get('/', function (req, res) {
+	res.render('gta', {
+		taglist: [],
+		lat: '',
+		lon: ''
+	});
 });
 
 /**
@@ -135,19 +137,19 @@ app.get('/', function(req, res) {
 // TODO: CODE ERGÄNZEN START
 
 app.post('/tagging', function (req, res) {
-    var lat = req.body.lat;
-    var lon = req.body.lon;
-    var name = req.body.myName;
-    var hashtag = req.body.myHashtag;
+	var lat = req.body.lat;
+	var lon = req.body.lon;
+	var name = req.body.myName;
+	var hashtag = req.body.myHashtag;
 
-    InMemory.add(new GeoTag(lat, lon, name, hashtag));
+	InMemory.add(new GeoTag(lat, lon, name, hashtag));
 
-    res.render('gta', {
-        taglist: InMemory.searchByRadius(lat, lon, 10),
-        lat: lat,
-        lon: lon,
-        tags: hashtag
-    });
+	res.render('gta', {
+		taglist: InMemory.searchByRadius(lat, lon, 10),
+		lat: lat,
+		lon: lon,
+		//datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 10))
+	});
 });
 
 /**
@@ -165,21 +167,25 @@ app.post('/tagging', function (req, res) {
 // TODO: CODE ERGÄNZEN
 
 app.post('/discovery', function (req, res) {
-    var lat = req.body.hLat;
-    var lon = req.body.hLon;
-    var term = req.body.searchTerm;
+	var lat = req.body.hLat;
+	var lon = req.body.hLon;
+	var term = req.body.searchTerm;
 
-    if(term){
-        res.render('gta', {
-            taglist: InMemory.searchByTerm(term),
-            lat: lat,
-            lon: lon
-        })} else {
-        res.render('gta', {
-            taglist: InMemory.searchByRadius(lat, lon, 10),
-            lat: lat,
-            lon: lon
-    })}
+	if (term) {
+		res.render('gta', {
+			taglist: InMemory.searchByTerm(term),
+			lat: lat,
+			lon: lon,
+			datatags: JSON.stringify(InMemory.searchByTerm(term))
+		})
+	} else {
+		res.render('gta', {
+			taglist: InMemory.searchByRadius(lat, lon, 10),
+			lat: lat,
+			lon: lon,
+			datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 10))
+		})
+	}
 });
 
 /**

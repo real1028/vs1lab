@@ -2,93 +2,95 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta content="width=device-width, initial-scale=1.0" name="viewport">
-	<title>GeoTagApp</title>
-	<link href='./stylesheets/style.css' rel='stylesheet'/>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>GeoTagApp</title>
+    <link href='./stylesheets/style.css' rel='stylesheet'/>
 </head>
 
 <body>
 
 <header>
-	<img alt="an image of a map and location" src="./images/location.png"
-		 width="100">
-	<h1>GeoTagApp</h1>
-	<nav>
-		<a href="#">About</a> | <a href="#">Help</a> | <a
-				href="/">Home</a>
-	</nav>
+    <img alt="an image of a map and location" src="./images/location.png"
+         width="100">
+    <h1>GeoTagApp</h1>
+    <nav>
+        <a href="#">About</a> | <a href="#">Help</a> | <a
+                href="/">Home</a>
+    </nav>
 </header>
 
 <main class="row">
 
-	<section class="tagging col-3">
-		<h2>Tagging</h2>
-		<!-- ############### Aufgabe1a Form1 Start -->
-		<form action="/tagging" id="tag-form" method="post">
-			<fieldset>
-				<legend>Enter new GeoTag</legend>
+    <section class="tagging col-3">
+        <h2>Tagging</h2>
+        <!-- ############### Aufgabe1a Form1 Start -->
+        <form action="/tagging" id="tag-form" method="post">
+            <fieldset>
+                <legend>Enter new GeoTag</legend>
 
-				<label for="latitude">Latitude</label>
-				<input name="lat" id="latitude" placeholder="latitude" required type="text"/>
+                <label for="latitude">Latitude</label>
+                <input name="lat" id="latitude" placeholder="latitude" required type="text" value="<%= lat %>"/>
 
-				<label for="longitude">Longitude</label>
-				<input name="lon" id="longitude" placeholder="longitude" required type="text"/>
+                <label for="longitude">Longitude</label>
+                <input name="lon" id="longitude" placeholder="longitude" required type="text" value="<%= lon %>"/>
 
-				<label for="name">Name</label>
-				<input name="myName" id="name" maxlength="10" pattern="[A-Za-z]*" placeholder="some name" required
-					   type="text"/>
+                <label for="name">Name</label>
+                <input name="myName" id="name" maxlength="10" pattern="[A-Za-z]*" placeholder="some name" required
+                       type="text"/>
 
-				<label for="hashtag">Hashtag</label>
-				<input name="myHashtag" id="hashtag" maxlength="11" pattern="#[A-Za-z]*" placeholder="# + max 10 letters"
-					   type="text"/>
+                <label for="hashtag">Hashtag</label>
+                <input name="myHashtag" id="hashtag" maxlength="11" pattern="#[A-Za-z]*"
+                       placeholder="# + max 10 letters"
+                       type="text"/>
 
-				<input type="submit" value="submit"/>
-			</fieldset>
-		</form>
-		<!-- ############### Aufgabe1a Form1 Ende -->
+                <input type="submit" value="submit"/>
+            </fieldset>
+        </form>
+        <!-- ############### Aufgabe1a Form1 Ende -->
 
-	</section>
+    </section>
 
 
-	<section class="discovery col-9">
-		<h2>Discovery</h2>
-		<!-- ############### Aufgabe1a Form2 Start -->
-		<form action="/discovery" id="filter-form" method="post">
-			<fieldset>
-				<legend>Filter by Searchterm</legend>
+    <section class="discovery col-9">
+        <h2>Discovery</h2>
+        <!-- ############### Aufgabe1a Form2 Start -->
+        <form action="/discovery" id="filter-form" method="post">
+            <fieldset>
+                <legend>Filter by Searchterm</legend>
 
-				<input name="searchTerm" id="search term" placeholder="search term" type="text"/>
+                <input name="searchTerm" id="search term" placeholder="search term" type="text"/>
 
-				<input name= "hLat" id="hidden_latitude" type="hidden"/>
-				<input name= "hLon" id="hidden_longitude" type="hidden"/>
+                <input name="hLat" id="hidden_latitude" type="hidden"/>
+                <input name="hLon" id="hidden_longitude" type="hidden"/>
 
-				<input type="submit" value="apply">
-			</fieldset>
+                <input type="submit" value="apply">
+            </fieldset>
 
-		</form>
-		<!-- ############### Aufgabe1a Form2 Ende -->
-		<div class="row">
+        </form>
+        <!-- ############### Aufgabe1a Form2 Ende -->
+        <div class="row">
 
-			<div class="taglist col-4">
-				<ul id="results">
-					<% if (taglist !== undefined) taglist.forEach(function(gtag) { %>
-						<li><%= gtag.name %> ( <%= gtag.latitude %>,<%= gtag.longitude %>) <%= gtag.hashtag %> </li>
-					<% }); %>
-				</ul>
-			</div>
-			<div class="tagmap col-8">
-				<img alt="a map with locations" id="result-img" src="./images/mapview.jpg"/>
-				<div class="caption">Result map</div>
-			</div>
+            <div class="taglist col-4">
+                <ul id="results">
+                    <% if (taglist !== undefined) taglist.forEach(function(gtag) { %>
+                        <li><%= gtag.name %> ( <%= gtag.latitude %>,<%= gtag.longitude %>) <%= gtag.hashtag %> </li>
+                    <% }); %>
+                </ul>
+            </div>
+            <div class="tagmap col-8">
+                <img alt="a map with locations" id="result-img" src="./images/mapview.jpg"
+                     data-tags="<%= JSON.stringify(taglist) %>"/>
+                <div class="caption">Result map</div>
+            </div>
 
-		</div>
-	</section>
+        </div>
+    </section>
 
 </main>
 
 <footer>
-	<span>2017 by LKIT</span>
+    <span>2017 by LKIT</span>
 </footer>
 
 <!-- Load JavaScripts
