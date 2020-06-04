@@ -36,14 +36,14 @@ app.use(express.static(__dirname + "/public"));
  * GeoTag Objekte sollen min. alle Felder des 'tag-form' Formulars aufnehmen.
  */
 
-var gtagConstructor = function(name, latitude, longitude, hashtag) {
-    return gtag = {
+function gtagConstructor(name, latitude, longitude, hashtag) {
+    return {
         name: name,
         latitude: latitude,
         longitude: longitude,
         hashtag: hashtag
     }
-};
+}
 
 
 /**
@@ -85,23 +85,15 @@ const tagsModule = (function () {
         },
         
         searchTag: function (searchterm) {
-            let gtag = [];
-            for (let i = 0; i < taglist.length; i++) {
-                if (taglist[i].hashtag.includes(searchterm) || taglist[i].name.includes(searchterm)) {
-                    gtag.push(taglist[i]);
-                }
-            }
-            return gtag;
+            return taglist.filter(function (entry) {
+                return entry.name.includes(searchterm) || entry.hashtag.includes(searchterm);
+            });
         },
         
         searchTagsWithRadius: function (coordinate, radius) {
-            let tagsWithRadius = [];
-            for (let i = 0; i < taglist.length; i++) {
-                if (distance(taglist[i].latitude, taglist[i].longitude, coordinate.latitude, coordinate.longitude) <= radius) {
-                    tagsWithRadius.push(taglist[i]);
-                }
-            }
-            return tagsWithRadius;
+            return taglist.filter(function (entry) {
+                return distance(entry.latitude, entry.longitude, coordinate.latitude, coordinate.longitude) <= radius;
+            });
         },
     };
 })();
@@ -142,7 +134,7 @@ app.get('/', function(req, res) {
 app.post('/tagging', function(req, res) {
     const gtag = gtagConstructor(req.body.name, parseFloat(req.body.latitude), parseFloat(req.body.longitude), req.body.hashtag);
     tagsModule.addTag(gtag);
-    const tagsToRender = tagsModule.searchTagsWithRadius({latitude: parseFloat(gtag.latitude), longitude: parseFloat(gtag.longitude)}, 20);
+    const tagsToRender = tagsModule.searchTagsWithRadius({latitude: gtag.latitude, longitude: gtag.longitude}, 20);
     res.render('gta', {
         taglist: tagsToRender,
         coordinates: {
@@ -170,10 +162,10 @@ app.post('/discovery', function(req, res) {
     var renderObject = {};
     if (gtag.length !== 0) {
         renderObject = {
-            taglist: tagsModule.searchTagsWithRadius({latitude: parseFloat(gtag[0].latitude), longitude: parseFloat(gtag[0].longitude)}, 20),
+            taglist: tagsModule.searchTagsWithRadius({latitude: gtag[0].latitude, longitude: gtag[0].longitude}, 20),
             coordinates: {
-                latitude: parseFloat(gtag[0].latitude),
-                longitude: parseFloat(gtag[0].longitude)
+                latitude: gtag[0].latitude,
+                longitude: gtag[0].longitude
             }
         }
     } else {
