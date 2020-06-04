@@ -120,20 +120,29 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
 		readme: "Dieses Objekt enthält 'öffentliche' Teile des Moduls.",
 
 		updateLocation: function () {
+			let imageNode = document.getElementById("result-img");
+			let tags = JSON.parse(imageNode.getAttribute("data-tags"));
 
-			tryLocate(function (onsuccess) {
-					let imageNode = document.getElementById("result-img");
-					let tags = JSON.parse(imageNode.getAttribute("data-tags"));
-					document.getElementById("latitude").value = getLatitude(onsuccess);
-					document.getElementById("longitude").value = getLongitude(onsuccess);
-					document.getElementById("hidden_latitude",).value = getLatitude(onsuccess);
-					document.getElementById("hidden_longitude").value = getLongitude(onsuccess);
-					imageNode.src = getLocationMapSrc(getLatitude(onsuccess), getLongitude(onsuccess), tags, 15);
-					//console.log(tags);
-				}, function (onerror) {
-					alert(onerror);
-				}
-			)
+			if (document.getElementById("latitude").value == '' || document.getElementById("longitude").value == '') {
+				console.log("trying to locate....");
+				tryLocate(function (onsuccess) {
+						let lat = getLatitude(onsuccess);
+						let lon = getLongitude(onsuccess);
+						document.getElementById("latitude").value = lat;
+						document.getElementById("longitude").value = lon;
+						document.getElementById("hidden_latitude",).value = lat;
+						document.getElementById("hidden_longitude").value = lon;
+						imageNode.src = getLocationMapSrc(lat, lon, tags, 5);
+					}, function (onerror) {
+						alert(onerror);
+					}
+				)
+			} else {
+				console.log("got data, no try")
+				let lat = document.getElementById("latitude").value;
+				let lon = document.getElementById("longitude").value;
+				imageNode.src = getLocationMapSrc(lat, lon, tags, 5);
+			}
 		}
 
 
@@ -146,6 +155,5 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
  * des Skripts.
  */
 $(function () {
-
 	gtaLocator.updateLocation();
 });

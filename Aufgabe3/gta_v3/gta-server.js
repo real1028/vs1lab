@@ -114,10 +114,13 @@ var InMemory = (function () {
  */
 
 app.get('/', function (req, res) {
+	let lat = req.body.lat;
+	let lon = req.body.lon;
 	res.render('gta', {
-		taglist: [],
-		lat: '',
-		lon: ''
+		taglist: InMemory.searchByRadius(lat, lon, 5),
+		lat: lat,
+		lon: lon,
+		datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 5))
 	});
 });
 
@@ -137,18 +140,18 @@ app.get('/', function (req, res) {
 // TODO: CODE ERGÄNZEN START
 
 app.post('/tagging', function (req, res) {
-	var lat = req.body.lat;
-	var lon = req.body.lon;
-	var name = req.body.myName;
-	var hashtag = req.body.myHashtag;
+	let lat = req.body.lat;
+	let lon = req.body.lon;
+	let name = req.body.myName;
+	let hashtag = req.body.myHashtag;
 
 	InMemory.add(new GeoTag(lat, lon, name, hashtag));
 
 	res.render('gta', {
-		taglist: InMemory.searchByRadius(lat, lon, 10),
+		taglist: InMemory.searchByRadius(lat, lon, 5),
 		lat: lat,
 		lon: lon,
-		//datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 10))
+		datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 5))
 	});
 });
 
@@ -180,10 +183,10 @@ app.post('/discovery', function (req, res) {
 		})
 	} else {
 		res.render('gta', {
-			taglist: InMemory.searchByRadius(lat, lon, 10),
+			taglist: InMemory.searchByRadius(lat, lon, 5),
 			lat: lat,
 			lon: lon,
-			datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 10))
+			datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 5))
 		})
 	}
 });

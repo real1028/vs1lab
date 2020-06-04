@@ -61,8 +61,8 @@
 
                 <input name="searchTerm" id="search term" placeholder="search term" type="text"/>
 
-                <input name="hLat" id="hidden_latitude" type="hidden"/>
-                <input name="hLon" id="hidden_longitude" type="hidden"/>
+                <input name="hLat" id="hidden_latitude" type="hidden" value="<%= lat %>"/>
+                <input name="hLon" id="hidden_longitude" type="hidden" value="<%= lon %>"/>
 
                 <input type="submit" value="apply">
             </fieldset>
@@ -80,7 +80,7 @@
             </div>
             <div class="tagmap col-8">
                 <img alt="a map with locations" id="result-img" src="./images/mapview.jpg"
-                     data-tags="<%= JSON.stringify(taglist) %>"/>
+                     data-tags="<%= datatags %>"/>
                 <div class="caption">Result map</div>
             </div>
 
