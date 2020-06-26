@@ -29,7 +29,7 @@ app.set('view engine', 'ejs');
  * Teste das Ergebnis im Browser unter 'http://localhost:3000/'.
  */
 
-// TODO: CODE ERGÄNZEN
+
 app.use(express.static(__dirname + "/public"));
 
 /**
@@ -37,7 +37,6 @@ app.use(express.static(__dirname + "/public"));
  * GeoTag Objekte sollen min. alle Felder des 'tag-form' Formulars aufnehmen.
  */
 
-// TODO: CODE ERGÄNZEN
 function GeoTag(latitude, longitude, name, hashtag) {
 	this.latitude = latitude;
 	this.longitude = longitude;
@@ -67,8 +66,6 @@ function GeoTag(latitude, longitude, name, hashtag) {
  * - Funktion zum hinzufügen eines Geo Tags.
  * - Funktion zum Löschen eines Geo Tags.
  */
-
-// TODO: CODE ERGÄNZEN
 
 var InMemory = (function () {
 	var tagList = [];
@@ -137,8 +134,6 @@ app.get('/', function (req, res) {
  * Die Objekte liegen in einem Standard Radius um die Koordinate (lat, lon).
  */
 
-// TODO: CODE ERGÄNZEN START
-
 app.post('/tagging', function (req, res) {
 	let lat = req.body.lat;
 	let lon = req.body.lon;
@@ -166,8 +161,6 @@ app.post('/tagging', function (req, res) {
  * Die Objekte liegen in einem Standard Radius um die Koordinate (lat, lon).
  * Falls 'term' vorhanden ist, wird nach Suchwort gefiltert.
  */
-
-// TODO: CODE ERGÄNZEN
 
 app.post('/discovery', function (req, res) {
 	var lat = req.body.hLat;
