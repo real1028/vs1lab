@@ -37,11 +37,12 @@ app.use(express.static(__dirname + "/public"));
  * GeoTag Objekte sollen min. alle Felder des 'tag-form' Formulars aufnehmen.
  */
 
-function GeoTag(latitude, longitude, name, hashtag) {
+function GeoTag(latitude, longitude, name, hashtag, id) {
 	this.latitude = latitude;
 	this.longitude = longitude;
 	this.name = name;
 	this.hashtag = hashtag;
+	this.id = id;
 
 	this.getLatitude = function () {
 		return this.latitude;
@@ -55,6 +56,21 @@ function GeoTag(latitude, longitude, name, hashtag) {
 	this.getHashtag = function () {
 		return this.hashtag;
 	};
+	this.getId = function (){
+		return this.id;
+	}
+	this.setLatitude = function (latitude) {
+		this.latitude = latitude;
+	}
+	this.setLongitude = function (longitude) {
+		this.longitude = longitude;
+	}
+	this.setName = function (name) {
+		this.name = name;
+	}
+	this.setHashtag = function (hashtag) {
+		this.hashtag = hashtag;
+	}
 }
 
 /**
@@ -67,11 +83,12 @@ function GeoTag(latitude, longitude, name, hashtag) {
  */
 
 var InMemory = (function () {
-	var tagList = [];
+	let tagList = [];
+	let id = 0;
 
 	return {
 		searchByRadius: function (latitude, longitude, radius) {
-			var resultList = tagList.filter(function (entry) {
+			let resultList = tagList.filter(function (entry) {
 				return (
 					(Math.abs(entry.getLatitude() - latitude) < radius) &&
 					(Math.abs(entry.getLongitude() - longitude) < radius)
@@ -81,7 +98,7 @@ var InMemory = (function () {
 		},
 
 		searchByTerm: function (term) {
-			var resultList = tagList.filter(function (entry) {
+			let resultList = tagList.filter(function (entry) {
 				return (
 					entry.getName().toString().includes(term) ||
 					entry.getHashtag().toString().includes(term)
@@ -90,12 +107,33 @@ var InMemory = (function () {
 			return resultList;
 		},
 
+		searchById: function(id){
+			return tagList.filter(tag => tag.id == id);
+		},
+
 		add: function (GeoTag) {
 			tagList.push(GeoTag);
 		},
-
-		remove: function (GeoTag) {
-			tagList.splice(GeoTag.getCurrentPosition(), 1);
+		change: function (latitude, longitude, name, hashtag, id) {
+			let tag = GeoTag.searchById(id);
+			if(latitude){
+				tag.setLatitude(latitude);
+			}
+			if(longitude){
+				tag.setLongitude(longitude);
+			}
+			if(name){
+				tag.setName(name);
+			}
+			if(hashtag){
+				tag.setHashtag(hashtag);
+			}
+		},
+		remove: function (id) {
+			tagList.splice(GeoTag.searchById(id), 1);
+		},
+		getLastElement: function(){
+			return tagList[tagList.length];
 		}
 	}
 })();
@@ -162,9 +200,9 @@ app.post('/tagging', function (req, res) {
  */
 
 app.post('/discovery', function (req, res) {
-	var lat = req.body.hLat;
-	var lon = req.body.hLon;
-	var term = req.body.searchTerm;
+	let lat = req.body.hLat;
+	let lon = req.body.hLon;
+	let term = req.body.searchTerm;
 
 	if (term) {
 		res.render('gta', {
@@ -181,6 +219,55 @@ app.post('/discovery', function (req, res) {
 			datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 5))
 		})
 	}
+});
+
+/**
+ * Aufgabe 4
+ */
+
+//get by radius, by term or all
+app.get('/geotags', function(req, res){
+	let stdRadius = 10;
+	let lat = req.query.lat;
+	let lon = req.query.lon;
+	let term = req.query.term;
+
+	if(term == undefined){
+		res.status(200).json(GeoTag.getAll());
+	} else if(term == ""){
+		res.status(200).json(GeoTag.searchByRadius(lat, lon, stdRadius));
+	} else {
+		res.status(200).json(GeoTag.searchByTerm(term));
+	}
+});
+
+//post new resource
+app.post('/geotags', function(req, res){
+	GeoTag.add(req.body);
+	res.status(201).json(GeoTag.getLastElement());
+});
+
+//get specific
+app.get('/geotags/:id',function(req, res){
+	let id = req.params.id;
+	res.status(200).json(GeoTag.searchById(id));
+});
+//put specific
+app.put('/geotags/:id',function(req, res){
+	let id = req.params.id;
+	let longitude = req.params.longitude;
+	let latitude = req.params.latitude;
+	let name = req.params.name;
+	let hashtag = req.params.hashtag;
+	GeoTag.change(latitude, longitude, name, hashtag, id);
+
+	res.status(204);
+});
+//delete specific
+app.del('/geotags/:id',function(req, res){
+	let id = req.params.id;
+	GeoTag.remove(GeoTag.searchById(id));
+	res.status(204);
 });
 
 /**
