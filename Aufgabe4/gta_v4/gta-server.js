@@ -57,7 +57,6 @@ function GeoTag(latitude, longitude, name, hashtag) {
 	};
 }
 
-
 /**
  * Modul für 'In-Memory'-Speicherung von GeoTags mit folgenden Komponenten:
  * - Array als Speicher für Geo Tags.

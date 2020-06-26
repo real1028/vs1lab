@@ -8,6 +8,59 @@
  */
 console.log("The script is going to start...");
 
+/**
+ * Ajax für Aufgabe 4
+ */
+//init
+var ajax = new XMLHttpRequest();
+
+//Tagging Button
+document.getElementById("tag-form button").on("click", function(event){
+
+	ajax.open("POST", "/geotags" , true);
+	ajax.setRequestHeader("Content-Type", "application/json");
+	ajax.responseType = "json";
+
+	let lat = document.getElementById("latitude").value
+	let lon = document.getElementById("longitude").value
+	let name = document.getElementById("hidden_latitude",).value
+	let hashtag = document.getElementById("hidden_longitude").value
+
+	ajax.send(JSON.stringify(new GeoTag(lat, lon, name, hashtag)));
+
+});
+//Discovery Button
+document.getElementById("filter-form button").on("click", function(event){
+
+	let latURL = "?lat="+document.getElementById("hidden_latitude").value();
+	let lonURL = "&lon="+document.getElementById("hidden_longitude").value();
+	let termURL = "&term="+document.getElementById("search term").value();
+
+	ajax.open("GET", "/geotags"+latURL+lonURL+termURL, true);
+	ajax.responseType = "json";
+	ajax.send(null);
+});
+
+//Refresh
+
+ajax.onreadystatechange = function() {
+
+	if(ajax.readyState == 4){
+		console.log(ajax.response);
+		let resultArray = ajax.response;
+		let results = "";
+
+		resultArray.forEach(function(tag){
+			results += "<li>";
+			results += (tag.name+" ("+tag.latitude+", "+tag.longitude+") "+tag.hashtag);
+			results += "</li>";
+		});
+
+		document.getElementById("results").html(results);
+		gtaLocator.updateLocation();
+	}
+}
+
 // Es folgen einige Deklarationen, die aber noch nicht ausgeführt werden ...
 
 // Hier wird die verwendete API für Geolocations gewählt
