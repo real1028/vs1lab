@@ -75,8 +75,8 @@ function GeoTag(latitude, longitude, name, hashtag) {
  */
 
 var InMemory = (function () {
-	let tagList = [];
-	let id = 0;
+	var tagList = [];
+	var id = 0;
 
 	return {
 		searchByRadius: function(latitude, longitude, radius){
@@ -104,7 +104,6 @@ var InMemory = (function () {
 		},
 
 		add: function(GeoTag){
-			GeoTag.id = id++;
 			tagList.push(GeoTag);
 		},
 

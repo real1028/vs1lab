@@ -34,7 +34,7 @@ submitTag.addEventListener("click", function() {
 	let lon = document.getElementById("longitude").value;
 	let name = document.getElementById("name").value;
 	let hashtag = document.getElementById("hashtag").value;
-	ajax.send(JSON.stringify(new GeoTag(name, parseFloat(lat), parseFloat(lon), hashtag)));
+	ajax.send(JSON.stringify(new GeoTag(parseFloat(lat), parseFloat(lon), name, hashtag)));
 });
 
 //Discovery Button
@@ -42,7 +42,7 @@ searchTag.addEventListener("click", function() {
 	console.log("suchen");
 	let latURL = "?lat=" + document.getElementById("hidden_latitude").value;
 	let lonURL = "&lon=" + document.getElementById("hidden_longitude").value;
-	let termURL = "&term=" + document.getElementById("searchterm").value;
+	let termURL = "&term=" + document.getElementById("search term").value;
 
 	ajax.open("GET", "/geotags"+latURL+lonURL+termURL, true);
 	ajax.responseType = "json";
@@ -54,11 +54,15 @@ searchTag.addEventListener("click", function() {
 ajax.onreadystatechange = function() {
 
 	if(ajax.readyState == 4){
-		console.log(ajax.response.innerHTML);
-		var resultArray = ajax.response;
-		var results = "";
+		console.log(ajax.response);
+		let resultArray = ajax.response;
+		let results = "";
 
-
+		resultArray.forEach(function(tag){
+			results += "<li>";
+			results += (tag.name+" ("+tag.latitude+", "+tag.longitude+") "+tag.hashtag);
+			results += "</li>";
+		});
 
 		$("#results").html(results);
 		gtaLocator.updateLocation();
@@ -189,7 +193,7 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
 						document.getElementById("longitude").value = lon;
 						document.getElementById("hidden_latitude",).value = lat;
 						document.getElementById("hidden_longitude").value = lon;
-						imageNode.src = getLocationMapSrc(lat, lon, tags, 5);
+						imageNode.src = getLocationMapSrc(lat, lon, tags);
 					}, function (onerror) {
 						alert(onerror);
 					}
@@ -198,8 +202,9 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
 				console.log("got data")
 				let lat = document.getElementById("latitude").value;
 				let lon = document.getElementById("longitude").value;
-				imageNode.src = getLocationMapSrc(lat, lon, tags, 5);
+				imageNode.src = getLocationMapSrc(lat, lon, tags);
 			}
+
 		}
 
 
