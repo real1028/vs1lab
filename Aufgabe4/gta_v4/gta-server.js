@@ -19,7 +19,8 @@ app = express();
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({
 	extended: false
-}));
+}))
+app.use(express.json());;
 
 // Setze ejs als View Engine
 app.set('view engine', 'ejs');
@@ -37,12 +38,12 @@ app.use(express.static(__dirname + "/public"));
  * GeoTag Objekte sollen min. alle Felder des 'tag-form' Formulars aufnehmen.
  */
 
-function GeoTag(latitude, longitude, name, hashtag, id) {
+function GeoTag(latitude, longitude, name, hashtag) {
 	this.latitude = latitude;
 	this.longitude = longitude;
 	this.name = name;
 	this.hashtag = hashtag;
-	this.id = id;
+	this.id = InMemory.getId();
 
 	this.getLatitude = function () {
 		return this.latitude;
@@ -58,15 +59,6 @@ function GeoTag(latitude, longitude, name, hashtag, id) {
 	};
 	this.getId = function (){
 		return this.id;
-	}
-	this.setLatitude = function (latitude) {
-		this.latitude = latitude;
-	}
-	this.setLongitude = function (longitude) {
-		this.longitude = longitude;
-	}
-	this.setName = function (name) {
-		this.name = name;
 	}
 	this.setHashtag = function (hashtag) {
 		this.hashtag = hashtag;
@@ -116,22 +108,6 @@ var InMemory = (function () {
 			tagList.push(GeoTag);
 		},
 
-		change: function(latitude, longitude, name, hashtag, id){
-			let tag = GeoTag.searchById(id);
-			if(latitude){
-				tag.setLatitude(latitude);
-			}
-			if(longitude){
-				tag.setLongitude(longitude);
-			}
-			if(name){
-				tag.setName(name);
-			}
-			if(hashtag){
-				tag.setHashtag(hashtag);
-			}
-		},
-
 		remove: function(id){
 			tagList.splice(GeoTag.searchById(id), 1);
 		},
@@ -142,6 +118,9 @@ var InMemory = (function () {
 
 		getTagList: function(){
 			return tagList;
+		},
+		getId: function () {
+			return id++;
 		}
 	}
 })();
@@ -159,10 +138,10 @@ app.get('/', function (req, res) {
 	let lat = req.body.lat;
 	let lon = req.body.lon;
 	res.render('gta', {
-		taglist: InMemory.searchByRadius(lat, lon, 5),
+		taglist: InMemory.getTagList(),
 		lat: lat,
 		lon: lon,
-		datatags: JSON.stringify(InMemory.searchByRadius(lat, lon, 5))
+		datatags: JSON.stringify(InMemory.getTagList())
 	});
 });
 
@@ -251,8 +230,9 @@ app.get('/geotags', function(req, res){
 
 //post new resource
 app.post('/geotags', function(req, res){
-	InMemory.add(req.body);
-	res.status(201).json(InMemory.getLastElement());
+	let id = InMemory.add(req.body);
+	res.header('Location', req.url + "/" + id);
+	res.status(201).json(InMemory.getTagList());
 });
 
 //get specific

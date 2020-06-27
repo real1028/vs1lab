@@ -19,50 +19,48 @@ var GeoTag = function (lat, lon, name, hashtag) {
 }
 //init
 var ajax = new XMLHttpRequest();
+var submitTag = document.getElementById("submit_button");
+var searchTag = document.getElementById("search_button");
 
 //Tagging Button
-var sendTagging = function(){
+submitTag.addEventListener("click", function() {
+	console.log("hinzufügen");
 
-	ajax.open("POST", "/geotags" , true);
+	ajax.open("POST", "/geotags", true);
 	ajax.setRequestHeader("Content-Type", "application/json");
 	ajax.responseType = "json";
 
-	let lat = document.getElementById("latitude").value
-	let lon = document.getElementById("longitude").value
-	let name = document.getElementById("hidden_latitude",).value
-	let hashtag = document.getElementById("hidden_longitude").value
-
-	ajax.send(JSON.stringify(new GeoTag(lat, lon, name, hashtag)));
-
-};
+	let lat = document.getElementById("latitude").value;
+	let lon = document.getElementById("longitude").value;
+	let name = document.getElementById("name").value;
+	let hashtag = document.getElementById("hashtag").value;
+	ajax.send(JSON.stringify(new GeoTag(name, parseFloat(lat), parseFloat(lon), hashtag)));
+});
 
 //Discovery Button
-var sendDiscovery = function(){
-
-	let latURL = "?lat="+document.getElementById("hidden_latitude").value;
-	let lonURL = "&lon="+document.getElementById("hidden_longitude").value;
-	let termURL = "&term="+document.getElementById("search term").value;
+searchTag.addEventListener("click", function() {
+	console.log("suchen");
+	let latURL = "?lat=" + document.getElementById("hidden_latitude").value;
+	let lonURL = "&lon=" + document.getElementById("hidden_longitude").value;
+	let termURL = "&term=" + document.getElementById("searchterm").value;
 
 	ajax.open("GET", "/geotags"+latURL+lonURL+termURL, true);
 	ajax.responseType = "json";
 	ajax.send(null);
-};
+});
 
 //Refresh
 
 ajax.onreadystatechange = function() {
+
 	if(ajax.readyState == 4){
-		console.log(ajax.response);
-		let resultArray = ajax.response;
-		let results = "";
+		console.log(ajax.response.innerHTML);
+		var resultArray = ajax.response;
+		var results = "";
 
-		resultArray.forEach(function(tag){
-			results += "<li>";
-			results += (tag.name+" ("+tag.latitude+", "+tag.longitude+") "+tag.hashtag);
-			results += "</li>";
-		});
 
-		document.getElementById("results").html = results;
+
+		$("#results").html(results);
 		gtaLocator.updateLocation();
 	}
 }
@@ -197,7 +195,7 @@ var gtaLocator = (function GtaLocator(geoLocationApi) {
 					}
 				)
 			} else {
-				console.log("got data, no try")
+				console.log("got data")
 				let lat = document.getElementById("latitude").value;
 				let lon = document.getElementById("longitude").value;
 				imageNode.src = getLocationMapSrc(lat, lon, tags, 5);
