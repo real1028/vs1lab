@@ -87,7 +87,7 @@ var InMemory = (function () {
 	let id = 0;
 
 	return {
-		searchByRadius: function (latitude, longitude, radius) {
+		searchByRadius: function(latitude, longitude, radius){
 			let resultList = tagList.filter(function (entry) {
 				return (
 					(Math.abs(entry.getLatitude() - latitude) < radius) &&
@@ -97,7 +97,7 @@ var InMemory = (function () {
 			return resultList;
 		},
 
-		searchByTerm: function (term) {
+		searchByTerm: function(term){
 			let resultList = tagList.filter(function (entry) {
 				return (
 					entry.getName().toString().includes(term) ||
@@ -111,10 +111,12 @@ var InMemory = (function () {
 			return tagList.filter(tag => tag.id == id);
 		},
 
-		add: function (GeoTag) {
+		add: function(GeoTag){
+			GeoTag.id = id++;
 			tagList.push(GeoTag);
 		},
-		change: function (latitude, longitude, name, hashtag, id) {
+
+		change: function(latitude, longitude, name, hashtag, id){
 			let tag = GeoTag.searchById(id);
 			if(latitude){
 				tag.setLatitude(latitude);
@@ -129,11 +131,17 @@ var InMemory = (function () {
 				tag.setHashtag(hashtag);
 			}
 		},
-		remove: function (id) {
+
+		remove: function(id){
 			tagList.splice(GeoTag.searchById(id), 1);
 		},
+
 		getLastElement: function(){
 			return tagList[tagList.length];
+		},
+
+		getTagList: function(){
+			return tagList;
 		}
 	}
 })();
@@ -233,24 +241,24 @@ app.get('/geotags', function(req, res){
 	let term = req.query.term;
 
 	if(term == undefined){
-		res.status(200).json(GeoTag.getAll());
+		res.status(200).json(InMemory.getTagList());
 	} else if(term == ""){
-		res.status(200).json(GeoTag.searchByRadius(lat, lon, stdRadius));
+		res.status(200).json(InMemory.searchByRadius(lat, lon, stdRadius));
 	} else {
-		res.status(200).json(GeoTag.searchByTerm(term));
+		res.status(200).json(InMemory.searchByTerm(term));
 	}
 });
 
 //post new resource
 app.post('/geotags', function(req, res){
-	GeoTag.add(req.body);
-	res.status(201).json(GeoTag.getLastElement());
+	InMemory.add(req.body);
+	res.status(201).json(InMemory.getLastElement());
 });
 
 //get specific
 app.get('/geotags/:id',function(req, res){
 	let id = req.params.id;
-	res.status(200).json(GeoTag.searchById(id));
+	res.status(200).json(InMemory.searchById(id));
 });
 //put specific
 app.put('/geotags/:id',function(req, res){
@@ -260,13 +268,12 @@ app.put('/geotags/:id',function(req, res){
 	let name = req.params.name;
 	let hashtag = req.params.hashtag;
 	GeoTag.change(latitude, longitude, name, hashtag, id);
-
 	res.status(204);
 });
 //delete specific
-app.del('/geotags/:id',function(req, res){
+app.delete('/geotags/:id',function(req, res){
 	let id = req.params.id;
-	GeoTag.remove(GeoTag.searchById(id));
+	InMemory.remove(InMemory.searchById(id));
 	res.status(204);
 });
 

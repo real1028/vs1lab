@@ -11,11 +11,17 @@ console.log("The script is going to start...");
 /**
  * Ajax für Aufgabe 4
  */
+var GeoTag = function (lat, lon, name, hashtag) {
+	this.latitude = lat;
+	this.longitude = lon;
+	this.name = name;
+	this.hashtag = hashtag;
+}
 //init
 var ajax = new XMLHttpRequest();
 
 //Tagging Button
-document.getElementById("tag-form button").on("click", function(event){
+var sendTagging = function(){
 
 	ajax.open("POST", "/geotags" , true);
 	ajax.setRequestHeader("Content-Type", "application/json");
@@ -28,23 +34,23 @@ document.getElementById("tag-form button").on("click", function(event){
 
 	ajax.send(JSON.stringify(new GeoTag(lat, lon, name, hashtag)));
 
-});
-//Discovery Button
-document.getElementById("filter-form button").on("click", function(event){
+};
 
-	let latURL = "?lat="+document.getElementById("hidden_latitude").value();
-	let lonURL = "&lon="+document.getElementById("hidden_longitude").value();
-	let termURL = "&term="+document.getElementById("search term").value();
+//Discovery Button
+var sendDiscovery = function(){
+
+	let latURL = "?lat="+document.getElementById("hidden_latitude").value;
+	let lonURL = "&lon="+document.getElementById("hidden_longitude").value;
+	let termURL = "&term="+document.getElementById("search term").value;
 
 	ajax.open("GET", "/geotags"+latURL+lonURL+termURL, true);
 	ajax.responseType = "json";
 	ajax.send(null);
-});
+};
 
 //Refresh
 
 ajax.onreadystatechange = function() {
-
 	if(ajax.readyState == 4){
 		console.log(ajax.response);
 		let resultArray = ajax.response;
@@ -56,7 +62,7 @@ ajax.onreadystatechange = function() {
 			results += "</li>";
 		});
 
-		document.getElementById("results").html(results);
+		document.getElementById("results").html = results;
 		gtaLocator.updateLocation();
 	}
 }

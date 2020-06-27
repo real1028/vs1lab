@@ -44,7 +44,7 @@
                        placeholder="# + max 10 letters"
                        type="text"/>
 
-                <input type="button" value="submit"/>
+                <input onclick="sendTagging()" type="button" value="submit"/>
             </fieldset>
         </form>
         <!-- ############### Aufgabe1a Form1 Ende -->
@@ -64,7 +64,7 @@
                 <input name="hLat" id="hidden_latitude" type="hidden" value="<%= lat %>"/>
                 <input name="hLon" id="hidden_longitude" type="hidden" value="<%= lon %>"/>
 
-                <input type="button" value="apply">
+                <input onclick="sendDiscovery()" type="button" value="apply">
             </fieldset>
 
         </form>
